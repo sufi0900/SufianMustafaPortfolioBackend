@@ -20,7 +20,10 @@ if (process.env.NODE_ENV === "production") {
   // Allow requests from your Netlify frontend domain
   app.use(
     cors({
-      origin: "https://sufianmustafa-a9308.web.app/",
+      origin: [
+        "https://sufianmustafa-a9308.web.app/",
+        "https://sufianmustafaportfolio.netlify.app",
+      ],
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       credentials: true, // Allow credentials such as cookies
     })
