@@ -31,6 +31,9 @@ export const createSkill = async (req, res) => {
 export const getSkills = async (req, res) => {
   const { page } = req.query;
   try {
+    // const Skills = await SkillModal.find();
+    // res.status(200).json(Skills);
+
     const limit = 22;
     const startIndex = (Number(page) - 1) * limit;
     const total = await SkillModal.countDocuments({});
@@ -45,7 +48,6 @@ export const getSkills = async (req, res) => {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
-
 export const getSkill = async (req, res) => {
   const { id } = req.params;
   try {
