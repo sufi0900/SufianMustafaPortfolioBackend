@@ -33,29 +33,14 @@ export const getSkills = async (req, res) => {
   try {
     const limit = 22;
     const startIndex = (Number(page) - 1) * limit;
-
-    // Check if data is present in cache for the specific page
-    const cachedData = cache.get(`skills_page_${page}`);
-    if (cachedData) {
-      return res.json(cachedData);
-    }
-
-    // Query the database to fetch the projects for the specific page and get the total count simultaneously
-    const [skills, total] = await Promise.all([
-      SkillModal.find().limit(limit).skip(startIndex).lean(),
-      SkillModal.countDocuments({}),
-    ]);
-
-    // Update cache with the fetched data for the specific page
-    const cachedSkills = {
-      data: skills,
+    const total = await SkillModal.countDocuments({});
+    const Skills = await SkillModal.find().limit(limit).skip(startIndex);
+    res.json({
+      data: Skills,
       currentPage: Number(page),
       totalSkills: total,
       numberOfPages: Math.ceil(total / limit),
-    };
-    cache.put(`skills_page_${page}`, cachedSkills);
-
-    res.json(cachedSkills);
+    });
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }
