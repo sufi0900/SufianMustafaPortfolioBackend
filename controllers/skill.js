@@ -1,10 +1,10 @@
-import SkillModal from "../models/skill.js";
+import Skill2Modal from "../models/skill2.js";
 import mongoose from "mongoose";
 import cache from "memory-cache"; // Adjust the caching library as needed
 
 export const createSkill = async (req, res) => {
   const Skill = req.body;
-  const newSkill = new SkillModal({
+  const newSkill = new Skill2Modal({
     ...Skill,
     creator: req.userId,
     createdAt: new Date().toISOString(),
@@ -38,7 +38,7 @@ export const deleteSkill = async (req, res) => {
     }
 
     // Remove the Skill from the database
-    await SkillModal.findByIdAndRemove(id);
+    await Skill2Modal.findByIdAndRemove(id);
 
     // Update the corresponding cache entries for all Skill cards
     const prefix = "Skills_";
@@ -90,7 +90,7 @@ export const updateSkill = async (req, res) => {
       imageFile3,
       _id: id,
     };
-    await SkillModal.findByIdAndUpdate(id, updatedSkill, { new: true });
+    await Skill2Modal.findByIdAndUpdate(id, updatedSkill, { new: true });
 
     // Update the corresponding cache entries for all Skill cards
     const prefix = "Skills_";
@@ -120,8 +120,8 @@ export const getSkills = async (req, res) => {
 
     // Query the database to fetch the Skills for the specific page and get the total count simultaneously
     const [Skills, total] = await Promise.all([
-      SkillModal.find().limit(limit).skip(startIndex).lean(),
-      SkillModal.countDocuments({}),
+      Skill2Modal.find().limit(limit).skip(startIndex).lean(),
+      Skill2Modal.countDocuments({}),
     ]);
 
     // Update cache with the fetched data for the specific page
@@ -142,7 +142,7 @@ export const getSkills = async (req, res) => {
 export const getSkill = async (req, res) => {
   const { id } = req.params;
   try {
-    const Skill = await SkillModal.findById(id);
+    const Skill = await Skill2Modal.findById(id);
     res.status(200).json(Skill);
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
@@ -160,7 +160,7 @@ export const getSkillsByUser = async (req, res) => {
     return res.json(cachedData);
   }
 
-  const userSkills = await SkillModal.find({ creator: id });
+  const userSkills = await Skill2Modal.find({ creator: id });
 
   // Update cache with the fetched data for the specific user
   cache.put(cacheKey, userSkills);
