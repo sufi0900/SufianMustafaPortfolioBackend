@@ -59,15 +59,13 @@ export const updateSkill = async (req, res) => {
   const { id } = req.params;
   const {
     title,
-    toptext1,
-    toptext2,
     description,
     creator,
+    percentage,
     imageFile,
     imageFile1,
     imageFile2,
     imageFile3,
-    link,
   } = req.body;
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -80,10 +78,9 @@ export const updateSkill = async (req, res) => {
     const updatedSkill = {
       creator,
       title,
-      toptext1,
-      toptext2,
       description,
-      link,
+      creator,
+      percentage,
       imageFile,
       imageFile1,
       imageFile2,
