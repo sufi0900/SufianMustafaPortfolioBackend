@@ -15,6 +15,10 @@ const skillSchema = mongoose.Schema({
   imageFile1: String,
   imageFile2: String,
   imageFile3: String,
+  createdAt: {
+    type: Date,
+    default: new Date(),
+  },
 });
 
 const SkillModal = mongoose.model("Skill", skillSchema);
