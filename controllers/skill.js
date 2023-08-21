@@ -106,7 +106,7 @@ export const updateSkill = async (req, res) => {
 export const getSkills = async (req, res) => {
   const { page } = req.query;
   try {
-    const limit = 7;
+    const limit = 20;
     const startIndex = (Number(page) - 1) * limit;
 
     // Check if data is present in cache for the specific page
