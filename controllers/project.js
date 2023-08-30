@@ -63,6 +63,9 @@ export const updateProject = async (req, res) => {
     toptext2,
     description,
     creator,
+    imgurl,
+    imgurl1,
+    imgurl2,
     imageFile,
     imageFile1,
     imageFile2,
@@ -84,6 +87,9 @@ export const updateProject = async (req, res) => {
       toptext2,
       description,
       link,
+      imgurl,
+      imgurl1,
+      imgurl2,
       imageFile,
       imageFile1,
       imageFile2,
@@ -106,39 +112,6 @@ export const updateProject = async (req, res) => {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
-export const getProjects = async (req, res) => {
-  const { page } = req.query;
-  try {
-    const limit = 3;
-    const startIndex = (Number(page) - 1) * limit;
-
-    // Check if data is present in cache for the specific page
-    const cachedData = cache.get(`projects_page_${page}`);
-    if (cachedData) {
-      return res.json(cachedData);
-    }
-
-    // Query the database to fetch the projects for the specific page and get the total count simultaneously
-    const [projects, total] = await Promise.all([
-      ProjectModal.find().limit(limit).skip(startIndex).lean(),
-      ProjectModal.countDocuments({}),
-    ]);
-
-    // Update cache with the fetched data for the specific page
-    const cachedProjects = {
-      data: projects,
-      currentPage: Number(page),
-      totalProjects: total,
-      numberOfPages: Math.ceil(total / limit),
-    };
-    cache.put(`projects_page_${page}`, cachedProjects);
-
-    res.json(cachedProjects);
-  } catch (error) {
-    res.status(404).json({ message: "Something went wrong" });
-  }
-};
-
 export const getProject = async (req, res) => {
   const { id } = req.params;
   try {
@@ -166,4 +139,62 @@ export const getProjectsByUser = async (req, res) => {
   cache.put(cacheKey, userProjects);
 
   res.status(200).json(userProjects);
+};
+
+export const getProjects = async (req, res) => {
+  const { page } = req.query;
+  try {
+    const limit = 3;
+    const startIndex = (Number(page) - 1) * limit;
+
+    // Check if data is present in cache for the specific page
+    const cachedData = cache.get(`projects_page_${page}`);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
+
+    // Query the database to fetch the projects for the specific page and get the total count simultaneously
+    const [projects, total] = await Promise.all([
+      ProjectModal.find().limit(limit).skip(startIndex).lean(),
+      ProjectModal.countDocuments({}),
+    ]);
+
+    // Preload the data for the next page and store it in cache
+    const nextPage = Number(page) + 1;
+    const nextStartIndex = startIndex + limit;
+    const nextProjects = await ProjectModal.find()
+      .limit(limit)
+      .skip(nextStartIndex)
+      .lean();
+    const cachedNextPage = {
+      data: nextProjects,
+      currentPage: nextPage,
+      totalProjects: total,
+      numberOfPages: Math.ceil(total / limit),
+    };
+    cache.put(`projects_page_${nextPage}`, cachedNextPage);
+
+    // Update cache with the fetched data for the specific page
+    const cachedProjects = {
+      data: projects,
+      currentPage: Number(page),
+      totalProjects: total,
+      numberOfPages: Math.ceil(total / limit),
+    };
+    cache.put(`projects_page_${page}`, cachedProjects);
+
+    res.json(cachedProjects);
+  } catch (error) {
+    res.status(404).json({ message: "Something went wrong" });
+  }
+};
+export const getProjectsBySearch = async (req, res) => {
+  const { searchQuery } = req.query;
+  try {
+    const title = new RegExp(searchQuery, "i");
+    const Projects = await ProjectModal.find({ title });
+    res.json(Projects);
+  } catch (error) {
+    res.status(404).json({ message: "Something went wrong" });
+  }
 };

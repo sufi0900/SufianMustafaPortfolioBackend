@@ -62,6 +62,10 @@ export const updateSkill = async (req, res) => {
     description,
     creator,
     percentage,
+    imgurl,
+    imgurl1,
+    imgurl2,
+
     imageFile,
     imageFile1,
     imageFile2,
@@ -80,6 +84,9 @@ export const updateSkill = async (req, res) => {
       title,
       description,
       creator,
+      imgurl,
+      imgurl1,
+      imgurl2,
       percentage,
       imageFile,
       imageFile1,
@@ -120,7 +127,20 @@ export const getSkills = async (req, res) => {
       Skill2Modal.find().limit(limit).skip(startIndex).lean(),
       Skill2Modal.countDocuments({}),
     ]);
-
+    // Preload the data for the next page and store it in cache
+    const nextPage = Number(page) + 1;
+    const nextStartIndex = startIndex + limit;
+    const nextSkills = await Skill2Modal.find()
+      .limit(limit)
+      .skip(nextStartIndex)
+      .lean();
+    const cachedNextPage = {
+      data: nextSkills,
+      currentPage: nextPage,
+      totalSkills: total,
+      numberOfPages: Math.ceil(total / limit),
+    };
+    cache.put(`skills_page_${nextPage}`, cachedNextPage);
     // Update cache with the fetched data for the specific page
     const cachedSkills = {
       data: Skills,
@@ -163,4 +183,22 @@ export const getSkillsByUser = async (req, res) => {
   cache.put(cacheKey, userSkills);
 
   res.status(200).json(userSkills);
+};
+export const getAllSkills = async (req, res) => {
+  try {
+    const skills = await TourModal.find().lean();
+    res.json(skills);
+  } catch (error) {
+    res.status(404).json({ message: "Something went wrong" });
+  }
+};
+export const getSkillsBySearch = async (req, res) => {
+  const { searchQuery } = req.query;
+  try {
+    const title = new RegExp(searchQuery, "i");
+    const Skills = await Skill2Modal.find({ title });
+    res.json(Skills);
+  } catch (error) {
+    res.status(404).json({ message: "Something went wrong" });
+  }
 };

@@ -10,7 +10,9 @@ const skill2Schema = mongoose.Schema({
   },
   percentage: Number,
   creator: String,
-
+  imgurl: String,
+  imgurl1: String,
+  imgurl2: String,
   imageFile: String,
   imageFile1: String,
   imageFile2: String,

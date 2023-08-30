@@ -7,10 +7,11 @@ import {
   deleteProject,
   getProject,
   getProjects,
+  getProjectsBySearch,
   getProjectsByUser,
   updateProject,
 } from "../controllers/project.js";
-
+router.get("/search", getProjectsBySearch);
 router.get("/", getProjects);
 router.get("/:id", getProject);
 

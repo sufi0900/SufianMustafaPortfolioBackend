@@ -7,10 +7,11 @@ import {
   deleteSkill,
   getSkill,
   getSkills,
+  getSkillsBySearch,
   getSkillsByUser,
   updateSkill,
 } from "../controllers/skill.js";
-
+router.get("/search", getSkillsBySearch);
 router.get("/", getSkills);
 router.get("/:id", getSkill);
 

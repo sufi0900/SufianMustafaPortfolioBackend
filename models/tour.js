@@ -11,6 +11,9 @@ const tourSchema = mongoose.Schema({
     type: String,
     index: true, // Add an index on the creator field
   },
+  imgurl: String,
+  imgurl1: String,
+  imgurl2: String,
   imageFile: String,
   imageFile1: String,
   imageFile2: String,

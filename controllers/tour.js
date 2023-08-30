@@ -30,7 +30,7 @@ export const createTour = async (req, res) => {
 export const getTours = async (req, res) => {
   const { page } = req.query;
   try {
-    const limit = 3;
+    const limit = 4;
     const startIndex = (Number(page) - 1) * limit;
 
     // Check if data is present in cache for the specific page
@@ -39,11 +39,27 @@ export const getTours = async (req, res) => {
       return res.json(cachedData);
     }
 
-    // Query the database to fetch the projects for the specific page and get the total count simultaneously
+    // Query the database to fetch the Tours for the specific page and get the total count simultaneously
     const [tours, total] = await Promise.all([
       TourModal.find().limit(limit).skip(startIndex).lean(),
       TourModal.countDocuments({}),
     ]);
+
+    // Preload the data for the next page and store it in cache
+    const nextPage = Number(page) + 1;
+    const nextStartIndex = startIndex + limit;
+    const nextTours = await TourModal.find()
+      .limit(limit)
+      .skip(nextStartIndex)
+      .lean();
+    const cachedNextPage = {
+      data: nextTours,
+      currentPage: nextPage,
+      totalTours: total,
+      numberOfPages: Math.ceil(total / limit),
+    };
+    cache.put(`tours_page_${nextPage}`, cachedNextPage);
+
     // Update cache with the fetched data for the specific page
     const cachedTours = {
       data: tours,
@@ -58,7 +74,33 @@ export const getTours = async (req, res) => {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
+// export const getAllTours = async (req, res) => {
+//   try {
+//     // Check if data is present in cache for all blogs
+//     const cachedData = cache.get("all_blogs");
+//     if (cachedData) {
+//       return res.json(cachedData);
+//     }
 
+//     // Query the database to fetch all blogs
+//     const blogs = await BlogModel.find().lean();
+
+//     // Update cache with the fetched data for all blogs
+//     cache.put("all_blogs", blogs);
+
+//     res.json(blogs);
+//   } catch (error) {
+//     res.status(500).json({ message: "Something went wrong" });
+//   }
+// };
+export const getAllTours = async (req, res) => {
+  try {
+    const tours = await TourModal.find().lean();
+    res.json(tours);
+  } catch (error) {
+    res.status(404).json({ message: "Something went wrong" });
+  }
+};
 export const getTour = async (req, res) => {
   const { id } = req.params;
   try {
@@ -119,6 +161,9 @@ export const updateTour = async (req, res) => {
     description,
     date,
     creator,
+    imgurl,
+    imgurl1,
+    imgurl2,
     imageFile,
     imageFile1,
     imageFile2,
@@ -135,6 +180,9 @@ export const updateTour = async (req, res) => {
       title,
       date,
       description,
+      imgurl,
+      imgurl1,
+      imgurl2,
       tags,
       imageFile,
       imageFile1,
@@ -153,6 +201,16 @@ export const updateTour = async (req, res) => {
     });
 
     res.json(updatedTour);
+  } catch (error) {
+    res.status(404).json({ message: "Something went wrong" });
+  }
+};
+export const getToursBySearch = async (req, res) => {
+  const { searchQuery } = req.query;
+  try {
+    const title = new RegExp(searchQuery, "i");
+    const Tours = await TourModal.find({ title });
+    res.json(Tours);
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }
