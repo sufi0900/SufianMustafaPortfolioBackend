@@ -48,7 +48,7 @@ app.use("/skill", skillRouter);
 app.use("/project", projectRouter);
 
 app.get("/", (req, res) => {
-  res.send("Welcome to tour API");
+  res.send("Welcome to Sufian Mustafa Portfolio (Backend) ");
 });
 
 const port = process.env.PORT || 5000;

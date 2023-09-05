@@ -30,7 +30,7 @@ export const createTour = async (req, res) => {
 export const getTours = async (req, res) => {
   const { page } = req.query;
   try {
-    const limit = 4;
+    const limit = 3;
     const startIndex = (Number(page) - 1) * limit;
 
     // Check if data is present in cache for the specific page
@@ -74,33 +74,7 @@ export const getTours = async (req, res) => {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
-// export const getAllTours = async (req, res) => {
-//   try {
-//     // Check if data is present in cache for all blogs
-//     const cachedData = cache.get("all_blogs");
-//     if (cachedData) {
-//       return res.json(cachedData);
-//     }
 
-//     // Query the database to fetch all blogs
-//     const blogs = await BlogModel.find().lean();
-
-//     // Update cache with the fetched data for all blogs
-//     cache.put("all_blogs", blogs);
-
-//     res.json(blogs);
-//   } catch (error) {
-//     res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
-export const getAllTours = async (req, res) => {
-  try {
-    const tours = await TourModal.find().lean();
-    res.json(tours);
-  } catch (error) {
-    res.status(404).json({ message: "Something went wrong" });
-  }
-};
 export const getTour = async (req, res) => {
   const { id } = req.params;
   try {
