@@ -11,16 +11,9 @@ import path from "path";
 
 const app = express();
 
-// Middlewares
 app.use(morgan("dev"));
 app.use(express.json({ limit: "30mb", extended: true }));
 app.use(express.urlencoded({ limit: "30mb", extended: true }));
-
-app.use("/users", userRouter);
-
-app.use("/tour", tourRouter);
-app.use("/skill", skillRouter);
-app.use("/project", projectRouter);
 
 if (process.env.NODE_ENV === "production") {
   // Allow requests from your Netlify frontend domain
@@ -33,16 +26,22 @@ if (process.env.NODE_ENV === "production") {
   );
 
   // Serve static files from the build folder
-  app.use(express.static("dist", { maxAge: "1d" }));
+  app.use(express.static("FrontEnd/build", { maxAge: "1d" }));
 
   // Handle routes for your frontend app
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "dist", "index.html"));
+    res.sendFile(path.join(__dirname, "FrontEnd", "build", "index.html"));
   });
 } else {
   // In development mode, you might want to enable CORS for local testing
   app.use(cors());
 }
+
+app.use("/users", userRouter);
+
+app.use("/tour", tourRouter);
+app.use("/skill", skillRouter);
+app.use("/project", projectRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to Sufian Mustafa Portfolio (Backend) ");
