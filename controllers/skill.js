@@ -60,13 +60,14 @@ export const updateSkill = async (req, res) => {
   const {
     title,
     description,
-    creator,
+
     percentage,
+    imageFile,
     imgurl,
     imgurl1,
     imgurl2,
+    creator,
 
-    imageFile,
     imageFile1,
     imageFile2,
     imageFile3,

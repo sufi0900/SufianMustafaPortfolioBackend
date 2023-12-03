@@ -7,6 +7,11 @@ import userRouter from "./routes/user.js";
 import tourRouter from "./routes/tour.js";
 import skillRouter from "./routes/skill.js";
 import projectRouter from "./routes/project.js";
+
+import portfolioRouter from "./routes/portfolio.js";
+import servicesRouter from "./routes/services.js";
+import testimonialRouter from "./routes/testimonial.js";
+import educationRouter from "./routes/education.js";
 import path from "path";
 
 const app = express();
@@ -43,11 +48,16 @@ app.use("/tour", tourRouter);
 app.use("/skill", skillRouter);
 app.use("/project", projectRouter);
 
+app.use("/portfolio", portfolioRouter);
+app.use("/education", educationRouter);
+app.use("/services", servicesRouter);
+app.use("/testimonial", testimonialRouter);
+
 app.get("/", (req, res) => {
   res.send("Welcome to Sufian Mustafa Portfolio (Backend) ");
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 
 mongoose
   .connect(

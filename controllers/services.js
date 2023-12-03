@@ -1,20 +1,20 @@
-import ProjectModal from "../models/project.js";
+import ServicesModal from "../models/services.js";
 import mongoose from "mongoose";
 import cache from "memory-cache";
 
-export const createProject = async (req, res) => {
-  const Project = req.body;
-  const newProject = new ProjectModal({
-    ...Project,
+export const createServices = async (req, res) => {
+  const Services = req.body;
+  const newServices = new ServicesModal({
+    ...Services,
     creator: req.userId,
     createdAt: new Date().toISOString(),
   });
 
   try {
-    await newProject.save();
+    await newServices.save();
 
-    // Update the cache with the newly created project
-    const prefix = "projects_";
+    // Update the cache with the newly created Services
+    const prefix = "Servicess_";
     const keys = cache.keys();
     keys.forEach((key) => {
       if (key.startsWith(prefix)) {
@@ -22,26 +22,26 @@ export const createProject = async (req, res) => {
       }
     });
 
-    res.status(201).json(newProject);
+    res.status(201).json(newServices);
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
 
-export const deleteProject = async (req, res) => {
+export const deleteServices = async (req, res) => {
   const { id } = req.params;
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(404)
-        .json({ message: `No Project exists with id: ${id}` });
+        .json({ message: `No Services exists with id: ${id}` });
     }
 
-    // Remove the project from the database
-    await ProjectModal.findByIdAndRemove(id);
+    // Remove the Services from the database
+    await ServicesModal.findByIdAndRemove(id);
 
-    // Update the corresponding cache entries for all project cards
-    const prefix = "projects_";
+    // Update the corresponding cache entries for all Services cards
+    const prefix = "Servicess_";
     const keys = cache.keys();
     keys.forEach((key) => {
       if (key.startsWith(prefix)) {
@@ -49,57 +49,54 @@ export const deleteProject = async (req, res) => {
       }
     });
 
-    res.json({ message: "Project deleted successfully" });
+    res.json({ message: "Services deleted successfully" });
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
 
-export const updateProject = async (req, res) => {
+export const updateServices = async (req, res) => {
   const { id } = req.params;
   const {
     title,
-    toptext1,
-    toptext2,
     description,
-    creator,
+    university,
+    name,
+    info,
+    resume,
     imgurl,
-    imgurl1,
-    imgurl2,
+    years,
     imageFile,
-    imageFile1,
-    imageFile2,
-    imageFile3,
+
+    creator,
     link,
   } = req.body;
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(404)
-        .json({ message: `No Project exists with id: ${id}` });
+        .json({ message: `No Services exists with id: ${id}` });
     }
 
-    // Update the project in the database
-    const updatedProject = {
-      creator,
+    // Update the Services in the database
+    const updatedServices = {
       title,
-      toptext1,
-      toptext2,
       description,
-      link,
+      university,
+      name,
+      info,
+      years,
+      resume,
       imgurl,
-      imgurl1,
-      imgurl2,
+
       imageFile,
-      imageFile1,
-      imageFile2,
-      imageFile3,
+      creator,
       _id: id,
     };
-    await ProjectModal.findByIdAndUpdate(id, updatedProject, { new: true });
+    await ServicesModal.findByIdAndUpdate(id, updatedServices, { new: true });
 
-    // Update the corresponding cache entries for all project cards
-    const prefix = "projects_";
+    // Update the corresponding cache entries for all Services cards
+    const prefix = "Servicess_";
     const keys = cache.keys();
     keys.forEach((key) => {
       if (key.startsWith(prefix)) {
@@ -107,93 +104,93 @@ export const updateProject = async (req, res) => {
       }
     });
 
-    res.json(updatedProject);
+    res.json(updatedServices);
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
-export const getProject = async (req, res) => {
+export const getServices = async (req, res) => {
   const { id } = req.params;
   try {
-    const project = await ProjectModal.findById(id);
-    res.status(200).json(project);
+    const Services = await ServicesModal.findById(id);
+    res.status(200).json(Services);
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
 
-export const getProjectsByUser = async (req, res) => {
+export const getServicessByUser = async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).json({ message: "User doesn't exist" });
   }
-  const cacheKey = `projects_user_${id}`;
+  const cacheKey = `Servicess_user_${id}`;
   const cachedData = cache.get(cacheKey);
   if (cachedData) {
     return res.json(cachedData);
   }
 
-  const userProjects = await ProjectModal.find({ creator: id });
+  const userServicess = await ServicesModal.find({ creator: id });
 
   // Update cache with the fetched data for the specific user
-  cache.put(cacheKey, userProjects);
+  cache.put(cacheKey, userServicess);
 
-  res.status(200).json(userProjects);
+  res.status(200).json(userServicess);
 };
 
-export const getProjects = async (req, res) => {
+export const getServicess = async (req, res) => {
   const { page } = req.query;
   try {
     const limit = 10;
     const startIndex = (Number(page) - 1) * limit;
 
     // Check if data is present in cache for the specific page
-    const cachedData = cache.get(`projects_page_${page}`);
+    const cachedData = cache.get(`Servicess_page_${page}`);
     if (cachedData) {
       return res.json(cachedData);
     }
 
-    // Query the database to fetch the projects for the specific page and get the total count simultaneously
-    const [projects, total] = await Promise.all([
-      ProjectModal.find().limit(limit).skip(startIndex).lean(),
-      ProjectModal.countDocuments({}),
+    // Query the database to fetch the Servicess for the specific page and get the total count simultaneously
+    const [Servicess, total] = await Promise.all([
+      ServicesModal.find().limit(limit).skip(startIndex).lean(),
+      ServicesModal.countDocuments({}),
     ]);
 
     // Preload the data for the next page and store it in cache
     const nextPage = Number(page) + 1;
     const nextStartIndex = startIndex + limit;
-    const nextProjects = await ProjectModal.find()
+    const nextServicess = await ServicesModal.find()
       .limit(limit)
       .skip(nextStartIndex)
       .lean();
     const cachedNextPage = {
-      data: nextProjects,
+      data: nextServicess,
       currentPage: nextPage,
-      totalProjects: total,
+      totalServicess: total,
       numberOfPages: Math.ceil(total / limit),
     };
-    cache.put(`projects_page_${nextPage}`, cachedNextPage);
+    cache.put(`Servicess_page_${nextPage}`, cachedNextPage);
 
     // Update cache with the fetched data for the specific page
-    const cachedProjects = {
-      data: projects,
+    const cachedServicess = {
+      data: Servicess,
       currentPage: Number(page),
-      totalProjects: total,
+      totalServicess: total,
       numberOfPages: Math.ceil(total / limit),
     };
-    cache.put(`projects_page_${page}`, cachedProjects);
+    cache.put(`Servicess_page_${page}`, cachedServicess);
 
-    res.json(cachedProjects);
+    res.json(cachedServicess);
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }
 };
-export const getProjectsBySearch = async (req, res) => {
+export const getServicessBySearch = async (req, res) => {
   const { searchQuery } = req.query;
   try {
     const title = new RegExp(searchQuery, "i");
-    const Projects = await ProjectModal.find({ title });
-    res.json(Projects);
+    const Servicess = await ServicesModal.find({ title });
+    res.json(Servicess);
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }

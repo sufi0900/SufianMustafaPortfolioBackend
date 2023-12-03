@@ -36,15 +36,15 @@ const auth = async (req, res, next) => {
     }
 
     // Check if more than one user exists
-    const otherUsers = await UserModal.countDocuments({
-      _id: { $ne: req.userId },
-    });
+    // const otherUsers = await UserModal.countDocuments({
+    //   _id: { $ne: req.userId },
+    // });
 
-    if (otherUsers > 0) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized - Account already created" });
-    }
+    // if (otherUsers > 0) {
+    //   return res
+    //     .status(401)
+    //     .json({ message: "Unauthorized - Account already created" });
+    // }
 
     // Update the user's email in the token if it has been changed
     if (user.newEmail && user.newEmail !== user.email) {

@@ -4,10 +4,7 @@ const skill2Schema = mongoose.Schema({
   title: String,
   description: String,
   name: String,
-  creator: {
-    type: String,
-    index: true, // Add an index on the creator field
-  },
+
   percentage: Number,
   creator: String,
   imgurl: String,
@@ -17,6 +14,10 @@ const skill2Schema = mongoose.Schema({
   imageFile1: String,
   imageFile2: String,
   imageFile3: String,
+  creator: {
+    type: String,
+    index: true, // Add an index on the creator field
+  },
   createdAt: {
     type: Date,
     default: new Date(),
